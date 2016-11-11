@@ -29,7 +29,39 @@ app.get('/api/:search', function(req, res) {
 app.get('/api/recent/searches', function(req, res) {
     var recents = [];
 
-    res.send(recents);
+    //get searches from db
+    mongo.connect(mongoURL, function(err, db) {
+        if(err) {
+            console.error(err); 
+        };    
+
+        var searches = db.collection('searches');
+        searches.count({}, function(err, count) {
+            if(err) {
+                console.error(err); 
+            }        
+
+            var skipNum = count > 10 ? count - 10 : 0;
+
+            searches.find().skip(skipNum).toArray(function(err, docs) {
+                if(err) {
+                    console.error(err); 
+                }
+
+                for(var i=0; i<docs.length; i++) {
+                    var search = {
+                        search: docs[i].search,
+                        time: docs[i].time
+                    }
+
+                    recents.push(search);
+                }
+
+                res.send(recents);
+                db.close();
+            });
+        });
+    });
 });
 
 app.listen(app.get('port'));
