@@ -11,6 +11,9 @@ var mongoURL = "mongodb://0.0.0.0:27017/searches";
 
 app.set('port', process.env.PORT || 8080);
 
+//index page
+app.use('/', express.static('public'));
+
 //search routing
 app.get('/api/:search', function(req, res) {
     var search = req.params.search,

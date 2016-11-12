@@ -1,0 +1,17 @@
+<h1>Free Code Camp "Image Search Abstraction Layer" Project</h1>
+
+<p>Takes a search string and returns up to ten image search results. An optional offset value may be passed to see subsequent pages of results. Can also return the ten most recent searches along with the time they were made (formatted as a unix timestamp).</p>
+
+<h3>Example search:</h3>
+<ul>
+        <li>thisapp.com/api/hello world?offset=2</li>
+        <li>might return:</li>
+        <li>[{"imgURL":"example.com/helloworld.jpg","pageURL":"example.com","pageTitle":"Example Domain"},{...}]</li>
+</ul>
+
+<h3>Example recents:</h3>
+<ul>
+        <li>thisapp.com/api/recent/searches</li>
+        <li>might return:</li>
+        <li>[{"search":"hello world","time":"1234567"},{...}]</li>
+</ul>
