@@ -1,5 +1,9 @@
 var express = require('express'),
-    mongo = require('mongodb').MongoClient;
+    mongo = require('mongodb').MongoClient,
+    https = require('https');
+
+//load my enviro variables
+require('dotenv').config();
 
 var app = express();
 var mongoURL = "mongodb://0.0.0.0:27017/searches";
@@ -10,6 +14,11 @@ app.set('port', process.env.PORT || 8080);
 app.get('/api/:search', function(req, res) {
     var search = req.params.search,
         offset = req.query.offset || 0;
+
+    //send request to Bing
+    var options = {
+        
+    }
 
     //store searches in db
     mongo.connect(mongoURL, function(err, db) {
