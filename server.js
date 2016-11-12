@@ -3,11 +3,11 @@ var express = require('express'),
     https = require('https'),
     url = require('url');
 
-//load my enviro variables
-require('dotenv').config();
+//load my enviro variables (commented out to fix heroku)
+//require('dotenv').config();
 
 var app = express();
-var mongoURL = "mongodb://0.0.0.0:27017/searches";
+var mongoURL = process.env.SEARCH_URI;
 
 app.set('port', process.env.PORT || 8080);
 
