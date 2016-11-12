@@ -1,6 +1,7 @@
 var express = require('express'),
     mongo = require('mongodb').MongoClient,
-    https = require('https');
+    https = require('https'),
+    url = require('url');
 
 //load my enviro variables
 require('dotenv').config();
@@ -17,8 +18,43 @@ app.get('/api/:search', function(req, res) {
 
     //send request to Bing
     var options = {
-        
+       host: 'api.cognitive.microsoft.com',
+       path: '/bing/v5.0/images/search?q='+encodeURIComponent(search)+'&count=10&offset='+offset,
+       headers: {
+            'Ocp-Apim-Subscription-Key': process.env.BING_API_KEY
+       }
     }
+
+    var request = https.request(options, function(response) {
+        var data = '';
+        response.on('data', (d) => {
+            data += d;
+        });    
+
+        response.on('end', function() {
+            var results = JSON.parse(data).value;
+            var toSend = [];
+            for(var i=0; i<results.length; i++) {
+                //so we can cut out the bing part
+                var pURL = url.parse(results[i].contentUrl, true);
+                var obj = {
+                    imgURL : pURL.query.r,
+                    pageURL : results[i].hostPageDisplayUrl,
+                    pageTitle : results[i].name
+                }                 
+
+                toSend.push(obj);
+            }
+
+            res.send(JSON.stringify(toSend));
+        });
+    }); 
+    
+    request.on('error', (e) => {
+        console.error(e)
+    });
+    
+    request.end();
 
     //store searches in db
     mongo.connect(mongoURL, function(err, db) {
@@ -30,8 +66,6 @@ app.get('/api/:search', function(req, res) {
         searches.insert({search: search, time: new Date().getTime()});
         db.close();
     });
-
-    res.send(JSON.stringify({search: search, offset: offset}));
 });
 
 //recent searches
@@ -66,7 +100,7 @@ app.get('/api/recent/searches', function(req, res) {
                     recents.push(search);
                 }
 
-                res.send(recents);
+                res.send(recents.reverse());
                 db.close();
             });
         });
